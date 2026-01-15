@@ -3,351 +3,268 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Bíblia Pro V4</title>
+    <title>Bíblia Digital</title>
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600&family=Inter:wght@400;600&family=Lato:wght@400;700&family=Merriweather:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;700&family=Lato:wght@400;700&family=Merriweather:wght@400;700;900&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --bg: #ffffff; --text: #2c3e50; --panel: #f8f9fa; --border: #e1e4e8; --accent: #2980b9;
-            --font-main: 'Inter', sans-serif;
-            --font-size: 18px;
+            --bg: #ffffff; --text: #1a1a1a; --panel: #f1f3f5; --border: #dee2e6; --accent: #007bff;
+            --font-size: 18px; --font-family: 'Inter', sans-serif;
         }
         [data-theme="dark"] {
-            --bg: #1a1a1a; --text: #ecf0f1; --panel: #2c3e50; --border: #444; --accent: #3498db;
+            --bg: #121212; --text: #e9ecef; --panel: #2b2f33; --border: #3d4246; --accent: #339af0;
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--font-main); padding-bottom: 100px; }
+        body { 
+            margin: 0; background: var(--bg); color: var(--text); 
+            font-family: var(--font-family); font-size: var(--font-size);
+            transition: background 0.3s; padding-bottom: 90px;
+        }
 
-        /* HEADER */
+        /* HEADER E BUSCA */
         header {
             position: sticky; top: 0; background: var(--bg); border-bottom: 1px solid var(--border);
-            padding: 10px 15px; display: flex; gap: 10px; align-items: center; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            padding: 10px 15px; display: flex; gap: 10px; align-items: center; z-index: 1000;
         }
-        
-        .search-bar {
-            flex: 1; padding: 8px 12px; border-radius: 20px; border: 1px solid var(--border);
-            background: var(--panel); color: var(--text); font-size: 16px; outline: none;
+        .search-box {
+            flex: 1; display: flex; background: var(--panel); border-radius: 20px; padding: 5px 15px; border: 1px solid var(--border);
         }
+        .search-box input {
+            border: none; background: none; color: var(--text); outline: none; width: 100%; font-size: 16px;
+        }
+        .icon-btn { background: none; border: none; font-size: 1.3rem; cursor: pointer; color: var(--text); }
 
-        .icon-btn { background: none; border: none; font-size: 1.4rem; cursor: pointer; color: var(--text); padding: 5px; }
-
-        /* CONTEÚDO */
-        main { max-width: 900px; margin: 0 auto; padding: 20px 15px; min-height: 60vh; }
-
-        .verse-block {
-            padding: 8px 10px; margin-bottom: 5px; border-radius: 8px; cursor: pointer; transition: background 0.2s;
-            font-size: var(--font-size); line-height: 1.6;
+        /* CONTEÚDO PRINCIPAL */
+        main { max-width: 800px; margin: 0 auto; padding: 20px; min-height: 70vh; }
+        .verse-row { 
+            padding: 10px; border-radius: 8px; cursor: pointer; transition: 0.2s; 
+            border-bottom: 1px solid var(--border);
         }
-        .verse-block:hover { background: var(--panel); }
-        
-        .v-num { font-size: 0.75em; font-weight: bold; color: var(--accent); margin-right: 8px; vertical-align: super; }
-        .version-tag { font-size: 0.6em; text-transform: uppercase; background: var(--border); padding: 2px 4px; border-radius: 4px; margin-right: 5px; color: var(--text); opacity: 0.7; }
-        
-        .nvi-text { color: #7f8c8d; margin-top: 5px; display: block; }
-        [data-theme="dark"] .nvi-text { color: #bdc3c7; }
+        .verse-row:hover { background: var(--panel); }
+        .v-num { font-weight: bold; color: var(--accent); font-size: 0.8em; margin-right: 10px; vertical-align: super; }
+        .v-tag { font-size: 0.6em; background: var(--border); padding: 2px 5px; border-radius: 4px; margin-right: 5px; font-weight: bold; }
+        .nvi-text { display: block; margin-top: 5px; opacity: 0.7; }
 
-        /* LISTA DE LIVROS NO FINAL (RODAPÉ) */
-        #books-footer {
-            max-width: 900px; margin: 40px auto 20px; padding: 20px; border-top: 2px solid var(--border);
+        /* ÍNDICE DE LIVROS (RODAPÉ) */
+        footer { max-width: 800px; margin: 30px auto; padding: 20px; border-top: 2px solid var(--border); }
+        .book-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 8px; }
+        .book-btn { 
+            background: var(--panel); border: 1px solid var(--border); padding: 8px; 
+            border-radius: 6px; text-align: center; cursor: pointer; font-size: 0.85rem; color: var(--text);
         }
-        .books-grid {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; margin-top: 15px;
-        }
-        .book-item {
-            background: var(--panel); padding: 10px; text-align: center; border-radius: 8px; 
-            border: 1px solid var(--border); cursor: pointer; font-size: 0.9rem;
-        }
-        .book-item:hover { background: var(--accent); color: white; border-color: var(--accent); }
+        .book-btn:hover { background: var(--accent); color: white; }
 
-        /* BARRA DE NAVEGAÇÃO INFERIOR */
-        .bottom-nav {
+        /* NAVEGAÇÃO FIXA */
+        .nav-bar {
             position: fixed; bottom: 0; left: 0; width: 100%; background: var(--bg);
-            border-top: 1px solid var(--border); padding: 10px; display: flex; justify-content: center; gap: 10px;
-            z-index: 100; box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            border-top: 1px solid var(--border); padding: 10px; display: flex; justify-content: center; gap: 8px;
         }
-        
-        .nav-btn {
-            background: var(--panel); border: 1px solid var(--border); color: var(--text);
-            padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; flex: 1; max-width: 80px;
-            display: flex; align-items: center; justify-content: center;
+        .nav-item {
+            flex: 1; max-width: 70px; padding: 12px; border: 1px solid var(--border);
+            background: var(--panel); border-radius: 8px; text-align: center; font-weight: bold; cursor: pointer;
         }
-        .nav-btn:active { background: var(--accent); color: white; }
 
-        /* MODAL DE CONFIGURAÇÕES */
+        /* CONFIGURAÇÕES */
         .modal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5);
-            display: none; justify-content: center; align-items: flex-end; z-index: 2000;
+            position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; 
+            justify-content: center; align-items: flex-end; z-index: 2000;
         }
         .modal-content {
-            background: var(--bg); width: 100%; max-width: 600px; border-radius: 20px 20px 0 0; padding: 25px;
-            max-height: 85vh; overflow-y: auto; box-shadow: 0 -5px 20px rgba(0,0,0,0.2);
+            background: var(--bg); width: 100%; max-width: 500px; padding: 20px; 
+            border-radius: 20px 20px 0 0; animation: slide 0.3s ease;
         }
-        
-        .setting-group { margin-bottom: 20px; }
-        .setting-label { display: block; font-weight: bold; margin-bottom: 10px; font-size: 0.9rem; color: var(--accent); }
-        .btn-group { display: flex; gap: 8px; flex-wrap: wrap; }
-        .option-btn {
-            padding: 8px 12px; border: 1px solid var(--border); border-radius: 15px; background: var(--panel);
-            color: var(--text); cursor: pointer; font-size: 0.9rem; flex: 1; text-align: center; min-width: 80px;
+        @keyframes slide { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .opt-row { margin-bottom: 15px; }
+        .opt-title { font-size: 0.8rem; font-weight: bold; color: var(--accent); display: block; margin-bottom: 8px; }
+        .btn-group { display: flex; gap: 5px; flex-wrap: wrap; }
+        .btn-group button { 
+            flex: 1; padding: 8px; border: 1px solid var(--border); border-radius: 10px; 
+            background: var(--panel); color: var(--text); cursor: pointer;
         }
-        .option-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+        .btn-group button.active { background: var(--accent); color: white; }
 
         #toast {
-            position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
-            background: #333; color: white; padding: 10px 20px; border-radius: 20px;
-            font-size: 14px; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 3000;
+            position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
+            background: #333; color: white; padding: 8px 20px; border-radius: 20px; opacity: 0; transition: 0.3s;
         }
-        .loading { text-align: center; padding: 40px; color: var(--text); font-style: italic; }
     </style>
 </head>
-<body>
+<body data-theme="light">
 
 <header>
-    <div style="font-weight:bold; cursor:pointer; font-size:1.1rem" onclick="window.scrollTo(0, document.body.scrollHeight)">
-        📖 <span id="header-title">Gênesis 1</span>
+    <div onclick="window.scrollTo(0, document.body.scrollHeight)" style="cursor:pointer; font-weight:bold;">
+        📖 <span id="cur-ref">Gênesis 1</span>
     </div>
-    <input type="text" id="search-input" class="search-bar" placeholder="Ex: João 3:16">
-    <button class="icon-btn" onclick="doSearch()" title="Pesquisar">🔍</button>
-    <button class="icon-btn" onclick="openSettings()" title="Configurações">⚙️</button>
+    <div class="search-box">
+        <input type="text" id="inp-search" placeholder="Ex: João 3:16" onkeypress="if(event.key==='Enter') doSearch()">
+        <button class="icon-btn" onclick="doSearch()">🔍</button>
+    </div>
+    <button class="icon-btn" onclick="toggleModal(true)">⚙️</button>
 </header>
 
-<main id="content">
-    <div class="loading" id="loader">Carregando Bíblia...</div>
+<main id="bible-box">
+    <div style="text-align:center; padding:50px;">A carregar capítulos...</div>
 </main>
 
-<div id="books-footer">
-    <h3 style="text-align:center; color:var(--accent)">Índice de Livros</h3>
-    <div class="books-grid" id="footer-books-list"></div>
+<footer>
+    <h3 style="text-align:center">Livros da Bíblia</h3>
+    <div class="book-grid" id="footer-books"></div>
+</footer>
+
+<div class="nav-bar">
+    <div class="nav-item" onclick="navigate('pb')" title="Livro Anterior">«</div>
+    <div class="nav-item" onclick="navigate('pc')" title="Capítulo Anterior">‹</div>
+    <div class="nav-item" onclick="navigate('nc')" title="Próximo Capítulo">›</div>
+    <div class="nav-item" onclick="navigate('nb')" title="Próximo Livro">»</div>
 </div>
 
-<div id="toast">Versículo copiado!</div>
-
-<div class="bottom-nav">
-    <button class="nav-btn" onclick="nav('prevBook')" title="Livro Anterior">&lt;&lt;</button>
-    <button class="nav-btn" onclick="nav('prevChap')" title="Capítulo Anterior">&lt;</button>
-    <button class="nav-btn" onclick="nav('nextChap')" title="Próximo Capítulo">&gt;</button>
-    <button class="nav-btn" onclick="nav('nextBook')" title="Próximo Livro">&gt;&gt;</button>
-</div>
-
-<div id="settings-modal" class="modal" onclick="closeSettings(event)">
+<div id="cfg-modal" class="modal" onclick="toggleModal(false)">
     <div class="modal-content" onclick="event.stopPropagation()">
-        
-        <div class="setting-group">
-            <span class="setting-label">VERSÃO</span>
+        <div class="opt-row">
+            <span class="opt-title">VERSÃO</span>
             <div class="btn-group">
-                <button class="option-btn" onclick="setVersion('acf')" id="btn-acf">ACF</button>
-                <button class="option-btn" onclick="setVersion('nvi')" id="btn-nvi">NVI</button>
-                <button class="option-btn" onclick="setVersion('dual')" id="btn-dual">Comparar</button>
+                <button id="v-acf" onclick="setVer('acf')">ACF</button>
+                <button id="v-nvi" onclick="setVer('nvi')">NVI</button>
+                <button id="v-dual" onclick="setVer('dual')">Comparar</button>
             </div>
         </div>
-
-        <div class="setting-group">
-            <span class="setting-label">MODO LEITURA</span>
+        <div class="opt-row">
+            <span class="opt-title">FONTE (ESTILO)</span>
             <div class="btn-group">
-                <button class="option-btn" onclick="setViewMode('chapter')" id="btn-mode-chap">Capítulo</button>
-                <button class="option-btn" onclick="setViewMode('book')" id="btn-mode-book">Livro Todo</button>
+                <button style="font-family:'Inter'" onclick="setFnt('Inter')">Padrão</button>
+                <button style="font-family:'Crimson Pro'" onclick="setFnt('Crimson Pro')">Clássica</button>
+                <button style="font-family:'Merriweather'; font-weight:700" onclick="setFnt('Merriweather')">Gordinha</button>
+                <button style="font-family:'Lato'" onclick="setFnt('Lato')">Moderna</button>
             </div>
         </div>
-
-        <div class="setting-group">
-            <span class="setting-label">FONTE (Estilo)</span>
+        <div class="opt-row">
+            <span class="opt-title">TAMANHO</span>
             <div class="btn-group">
-                <button class="option-btn" style="font-family:'Inter', sans-serif" onclick="setFont('Inter')">Padrão</button>
-                <button class="option-btn" style="font-family:'Crimson Pro', serif" onclick="setFont('Crimson Pro')">Jornal</button>
-                <button class="option-btn" style="font-family:'Merriweather', serif; font-weight:300" onclick="setFont('Merriweather')">Gordinha</button>
-                <button class="option-btn" style="font-family:'Lato', sans-serif" onclick="setFont('Lato')">Moderna</button>
+                <button onclick="chSize(-2)">A -</button>
+                <button onclick="chSize(0)">Normal</button>
+                <button onclick="chSize(2)">A +</button>
             </div>
         </div>
-
-        <div class="setting-group">
-            <span class="setting-label">TAMANHO DA LETRA</span>
+        <div class="opt-row">
+            <span class="opt-title">TEMA</span>
             <div class="btn-group">
-                <button class="option-btn" onclick="changeSize(-2)">A-</button>
-                <button class="option-btn" onclick="resetSize()">Normal</button>
-                <button class="option-btn" onclick="changeSize(2)">A+</button>
+                <button onclick="setThm('light')">☀️ Dia</button>
+                <button onclick="setThm('dark')">🌙 Noite</button>
             </div>
         </div>
-
-        <div class="setting-group">
-            <span class="setting-label">TEMA</span>
-            <div class="btn-group">
-                <button class="option-btn" onclick="setTheme('light')">☀️ Dia</button>
-                <button class="option-btn" onclick="setTheme('dark')">🌙 Noite</button>
-            </div>
-        </div>
-
-        <button class="option-btn" style="width:100%; background:#e74c3c; color:white; border:none; margin-top:10px" onclick="closeSettings(null, true)">Fechar Configurações</button>
+        <button onclick="toggleModal(false)" style="width:100%; padding:12px; border:none; background:var(--accent); color:white; border-radius:10px; margin-top:10px">Fechar</button>
     </div>
 </div>
 
-<script>
-    let bible = { acf: [], nvi: [] };
-    let state = { book: 0, chapter: 0, version: 'acf', viewMode: 'chapter', fontSize: 18, fontFamily: 'Inter', theme: 'light' };
-    const bookNames = ["Gênesis","Êxodo","Levítico","Números","Deuteronômio","Josué","Juízes","Rute","1 Samuel","2 Samuel","1 Reis","2 Reis","1 Crônicas","2 Crônicas","Esdras","Neemias","Ester","Jó","Salmos","Provérbios","Eclesiastes","Cantares","Isaías","Jeremias","Lamentações","Ezequiel","Daniel","Oséias","Joel","Amós","Obadias","Jonas","Miquéias","Naum","Habacuque","Sofonias","Ageu","Zacarias","Malaquias","Mateus","Marcos","Lucas","João","Atos","Romanos","1 Coríntios","2 Coríntios","Gálatas","Efésios","Filipenses","Colossenses","1 Tessalonicenses","2 Tessalonicenses","1 Timóteo","2 Timóteo","Tito","Filemon","Hebreus","Tiago","1 Pedro","2 Pedro","1 João","2 João","3 João","Judas","Apocalipse"];
-    const abbrevMap = {};
+<div id="toast">Copiado!</div>
 
-    // --- INICIALIZAÇÃO ---
+<script>
+    let data = { acf: [], nvi: [] };
+    let cfg = { b: 0, c: 0, v: 'acf', f: 'Inter', s: 18, t: 'light' };
+    const bNames = ["Gênesis","Êxodo","Levítico","Números","Deuteronômio","Josué","Juízes","Rute","1 Samuel","2 Samuel","1 Reis","2 Reis","1 Crônicas","2 Crônicas","Esdras","Neemias","Ester","Jó","Salmos","Provérbios","Eclesiastes","Cantares","Isaías","Jeremias","Lamentações","Ezequiel","Daniel","Oséias","Joel","Amós","Obadias","Jonas","Miquéias","Naum","Habacuque","Sofonias","Ageu","Zacarias","Malaquias","Mateus","Marcos","Lucas","João","Atos","Romanos","1 Coríntios","2 Coríntios","Gálatas","Efésios","Filipenses","Colossenses","1 Tessalonicenses","2 Tessalonicenses","1 Timóteo","2 Timóteo","Tito","Filemon","Hebreus","Tiago","1 Pedro","2 Pedro","1 João","2 João","3 João","Judas","Apocalipse"];
+
     async function init() {
         try {
             const [r1, r2] = await Promise.all([fetch('acf.json'), fetch('nvi.json')]);
-            if(!r1.ok || !r2.ok) throw new Error("Erro HTTP");
-            bible.acf = await r1.json();
-            bible.nvi = await r2.json();
-
-            // Configura mapa de busca
-            bible.acf.forEach((b, i) => {
-                abbrevMap[b.abbrev.toLowerCase()] = i;
-                abbrevMap[bookNames[i].toLowerCase()] = i;
-            });
-
-            // Enter na Busca
-            document.getElementById('search-input').addEventListener("keypress", function(event) {
-                if (event.key === "Enter") doSearch();
-            });
-
-            loadState();
-            generateFooterBooks();
-            render();
-            document.getElementById('loader').style.display = 'none';
-        } catch(e) {
-            document.getElementById('content').innerHTML = "<h3 style='color:red; text-align:center'>Erro ao carregar arquivos .json.<br>Verifique se 'acf.json' e 'nvi.json' estão no repositório.</h3>";
-        }
-    }
-
-    // --- RENDER ---
-    function render() {
-        const content = document.getElementById('content');
-        const b = bible.acf[state.book];
-        document.getElementById('header-title').innerText = state.viewMode === 'book' ? bookNames[state.book] : `${bookNames[state.book]} ${state.chapter + 1}`;
-
-        let html = '';
-        let start = state.viewMode === 'book' ? 0 : state.chapter;
-        let end = state.viewMode === 'book' ? b.chapters.length : state.chapter + 1;
-
-        for (let c = start; c < end; c++) {
-            if (state.viewMode === 'book') html += `<h3 style="margin-top:30px; border-bottom:1px solid var(--border)">Capítulo ${c+1}</h3>`;
+            data.acf = await r1.json();
+            data.nvi = await r2.json();
             
-            const chapACF = bible.acf[state.book].chapters[c];
-            const chapNVI = bible.nvi[state.book].chapters[c];
-
-            chapACF.forEach((vText, i) => {
-                let vHTML = `<div class="verse-block" onclick="copyVerse(this, '${bookNames[state.book]} ${c+1}:${i+1}')">`;
-                
-                if (state.version === 'acf' || state.version === 'dual') {
-                    vHTML += `<div><span class="v-num">${i + 1}</span>${state.version === 'dual' ? '<span class="version-tag">ACF</span>' : ''}${vText}</div>`;
-                }
-                if (state.version === 'nvi' || state.version === 'dual') {
-                    let txt = chapNVI[i] || '';
-                    if(state.version === 'nvi') vHTML += `<div><span class="v-num">${i + 1}</span>${txt}</div>`;
-                    else vHTML += `<div class="nvi-text"><span class="version-tag">NVI</span>${txt}</div>`;
-                }
-                vHTML += `</div>`;
-                html += vHTML;
-            });
-        }
-        
-        if(state.viewMode === 'chapter') {
-            html += `<button onclick="nav('nextChap')" style="width:100%; padding:15px; margin-top:20px; cursor:pointer; background:var(--panel); border:1px solid var(--border); border-radius:10px;">Carregar Próximo Capítulo ⬇</button>`;
-        }
-
-        content.innerHTML = html;
-        window.scrollTo(0, 0);
-        saveState();
-        updateUI();
+            const saved = JSON.parse(localStorage.getItem('biblia_cfg'));
+            if(saved) cfg = {...cfg, ...saved};
+            
+            renderBooks();
+            applyCfg();
+            draw();
+        } catch(e) { document.getElementById('bible-box').innerHTML = "Erro ao carregar dados."; }
     }
 
-    // --- LÓGICA ---
-    function nav(act) {
-        const tBooks = bible.acf.length;
-        const tChaps = bible.acf[state.book].chapters.length;
+    function draw() {
+        const box = document.getElementById('bible-box');
+        const b = data.acf[cfg.b];
+        document.getElementById('cur-ref').innerText = `${bNames[cfg.b]} ${cfg.c + 1}`;
+        
+        let html = '';
+        const chA = b.chapters[cfg.c];
+        const chN = data.nvi[cfg.b].chapters[cfg.c];
 
-        if (act === 'nextChap') {
-            if (state.chapter < tChaps - 1) state.chapter++;
-            else if (state.book < tBooks - 1) { state.book++; state.chapter = 0; }
-        } else if (act === 'prevChap') {
-            if (state.chapter > 0) state.chapter--;
-            else if (state.book > 0) { state.book--; state.chapter = bible.acf[state.book].chapters.length - 1; }
-        } else if (act === 'nextBook') {
-            if (state.book < tBooks - 1) { state.book++; state.chapter = 0; }
-        } else if (act === 'prevBook') {
-            if (state.book > 0) { state.book--; state.chapter = 0; }
+        chA.forEach((v, i) => {
+            html += `<div class="verse-row" onclick="copyVerse(this, '${bNames[cfg.b]} ${cfg.c+1}:${i+1}')">`;
+            if(cfg.v === 'acf' || cfg.v === 'dual') {
+                html += `<div><span class="v-num">${i+1}</span>${cfg.v==='dual'?'<span class="v-tag">ACF</span>':''}${v}</div>`;
+            }
+            if(cfg.v === 'nvi' || cfg.v === 'dual') {
+                const txt = chN[i] || '---';
+                if(cfg.v === 'nvi') html += `<div><span class="v-num">${i+1}</span>${txt}</div>`;
+                else html += `<div class="nvi-text"><span class="v-tag">NVI</span>${txt}</div>`;
+            }
+            html += `</div>`;
+        });
+
+        box.innerHTML = html;
+        window.scrollTo(0,0);
+        localStorage.setItem('biblia_cfg', JSON.stringify(cfg));
+        updateBtns();
+    }
+
+    function navigate(op) {
+        if(op==='nc') { 
+            if(cfg.c < data.acf[cfg.b].chapters.length-1) cfg.c++; 
+            else if(cfg.b < 65) { cfg.b++; cfg.c=0; }
         }
-        render();
+        else if(op==='pc') {
+            if(cfg.c > 0) cfg.c--;
+            else if(cfg.b > 0) { cfg.b--; cfg.c = data.acf[cfg.b].chapters.length-1; }
+        }
+        else if(op==='nb') { if(cfg.b < 65) { cfg.b++; cfg.c=0; } }
+        else if(op==='pb') { if(cfg.b > 0) { cfg.b--; cfg.c=0; } }
+        draw();
     }
 
     function doSearch() {
-        const inp = document.getElementById('search-input').value.toLowerCase().trim();
-        const m = inp.match(/(\d?\s?[a-zçãõêíóú]+)\s+(\d+)(?:[:\.](\d+))?/);
-        if (m) {
-            let name = m[1].trim(), chap = parseInt(m[2]) - 1;
-            let idx = abbrevMap[name] !== undefined ? abbrevMap[name] : -1;
-            
-            if (idx === -1) {
-                for (let k in abbrevMap) if (k.startsWith(name)) { idx = abbrevMap[k]; break; }
+        const q = document.getElementById('inp-search').value.toLowerCase();
+        const m = q.match(/(\d?\s?[a-zçãõêíóú]+)\s+(\d+)/);
+        if(m) {
+            const name = m[1].trim();
+            const c = parseInt(m[2]) - 1;
+            const bIdx = bNames.findIndex(n => n.toLowerCase().startsWith(name));
+            if(bIdx !== -1 && c >= 0 && c < data.acf[bIdx].chapters.length) {
+                cfg.b = bIdx; cfg.c = c; draw();
             }
-
-            if (idx !== -1 && chap >= 0 && chap < bible.acf[idx].chapters.length) {
-                state.book = idx; state.chapter = chap; state.viewMode = 'chapter';
-                render();
-            } else { alert("Não encontrado. Tente 'Joao 3' ou 'Gn 1'"); }
         }
     }
 
-    function generateFooterBooks() {
-        const div = document.getElementById('footer-books-list');
-        div.innerHTML = bookNames.map((n, i) => `
-            <div class="book-item" onclick="goToBook(${i})">${n}</div>
-        `).join('');
-    }
-
-    function goToBook(i) {
-        state.book = i; state.chapter = 0; state.viewMode = 'chapter';
-        render();
-        window.scrollTo(0,0);
-    }
-
-    // --- CONFIGS ---
-    function openSettings() { document.getElementById('settings-modal').style.display = 'flex'; }
-    function closeSettings(e, force) { if(force || e.target.id === 'settings-modal') document.getElementById('settings-modal').style.display = 'none'; }
-    
-    function setVersion(v) { state.version = v; updateUI(); render(); }
-    function setViewMode(m) { state.viewMode = m; updateUI(); render(); }
-    
-    function setFont(f) { 
-        state.fontFamily = f; 
-        document.documentElement.style.setProperty('--font-main', f === 'Inter' ? "'Inter', sans-serif" : `'${f}', serif`);
-        saveState();
-    }
-    
-    function changeSize(d) { state.fontSize += d; applyStyle(); saveState(); }
-    function resetSize() { state.fontSize = 18; changeSize(0); }
-    function setTheme(t) { state.theme = t; applyStyle(); saveState(); }
-
-    function applyStyle() {
-        document.body.setAttribute('data-theme', state.theme);
-        document.documentElement.style.setProperty('--font-size', state.fontSize + 'px');
-        document.documentElement.style.setProperty('--font-main', state.fontFamily === 'Inter' ? "'Inter', sans-serif" : `'${state.fontFamily}', serif`);
-    }
-
-    function updateUI() {
-        document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(`btn-${state.version}`).classList.add('active');
-        document.getElementById(`btn-mode-${state.viewMode === 'book' ? 'book' : 'chap'}`).classList.add('active');
+    function renderBooks() {
+        document.getElementById('footer-books').innerHTML = bNames.map((n, i) => 
+            `<div class="book-btn" onclick="cfg.b=${i}; cfg.c=0; draw();">${n}</div>`
+        ).join('');
     }
 
     function copyVerse(el, ref) {
-        const txt = el.innerText.replace(/ACF|NVI/g, '').replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
-        navigator.clipboard.writeText(`${txt} (${ref})`);
-        const t = document.getElementById('toast'); t.style.opacity = 1; setTimeout(() => t.style.opacity = 0, 2000);
+        const t = el.innerText.replace(/ACF|NVI/g, '').replace(/\s+/g, ' ').trim();
+        navigator.clipboard.writeText(`${t} (${ref})`);
+        const toast = document.getElementById('toast');
+        toast.style.opacity = 1; setTimeout(() => toast.style.opacity = 0, 2000);
     }
 
-    function saveState() { localStorage.setItem('bibleState_v4', JSON.stringify(state)); }
-    function loadState() {
-        const s = JSON.parse(localStorage.getItem('bibleState_v4'));
-        if (s) { state = { ...state, ...s }; applyStyle(); }
+    function toggleModal(s) { document.getElementById('cfg-modal').style.display = s ? 'flex' : 'none'; }
+    function setVer(v) { cfg.v = v; draw(); }
+    function setThm(t) { cfg.t = t; applyCfg(); }
+    function setFnt(f) { cfg.f = f; applyCfg(); }
+    function chSize(d) { if(d===0) cfg.s=18; else cfg.s+=d; applyCfg(); }
+
+    function applyCfg() {
+        document.body.setAttribute('data-theme', cfg.t);
+        document.documentElement.style.setProperty('--font-size', cfg.s + 'px');
+        document.documentElement.style.setProperty('--font-family', cfg.f === 'Merriweather' ? "'Merriweather', serif" : (cfg.f === 'Crimson Pro' ? "'Crimson Pro', serif" : `'${cfg.f}', sans-serif`));
+        localStorage.setItem('biblia_cfg', JSON.stringify(cfg));
+    }
+
+    function updateBtns() {
+        document.querySelectorAll('.btn-group button').forEach(b => b.classList.remove('active'));
+        document.getElementById('v-'+cfg.v).classList.add('active');
     }
 
     init();
