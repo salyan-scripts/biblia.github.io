@@ -2,180 +2,382 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bíblia Comparativa</title>
-    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Bíblia Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600&family=Inter:wght@400;600&family=Lato:wght@400;700&family=Merriweather:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #ffffff; --text: #1a1a1a; --border: #eeeeee; --accent: #3498db;
+            --bg: #ffffff; --text: #2c3e50; --panel: #f8f9fa; --border: #e1e4e8; --accent: #2980b9;
+            --font-main: 'Inter', sans-serif;
+            --font-size: 18px;
         }
         [data-theme="dark"] {
-            --bg: #121212; --text: #e0e0e0; --border: #333333; --accent: #5dade2;
+            --bg: #1a1a1a; --text: #ecf0f1; --panel: #2c3e50; --border: #444; --accent: #3498db;
         }
-        body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); }
-        
-        header { 
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--font-main); padding-bottom: 80px; }
+
+        /* --- HEADER --- */
+        header {
             position: sticky; top: 0; background: var(--bg); border-bottom: 1px solid var(--border);
-            padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; z-index: 100;
+            padding: 10px 15px; display: flex; gap: 10px; align-items: center; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .search-bar {
+            flex: 1; padding: 8px 12px; border-radius: 20px; border: 1px solid var(--border);
+            background: var(--panel); color: var(--text); font-size: 16px; outline: none;
         }
 
-        .controls { display: flex; gap: 10px; }
-        button { padding: 8px 15px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg); color: var(--text); cursor: pointer; }
-        button.active { background: var(--accent); color: white; border-color: var(--accent); }
+        .icon-btn {
+            background: none; border: none; font-size: 1.4rem; cursor: pointer; color: var(--text); padding: 5px;
+        }
 
-        main { max-width: 900px; margin: 0 auto; padding: 20px; }
-        
-        /* Estilo da Comparação Vertical */
-        .verse-container { margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid var(--border); }
-        .verse-text { font-family: 'Crimson Pro', serif; font-size: 1.25rem; line-height: 1.5; margin-bottom: 8px; }
-        .v-label { font-size: 0.7rem; font-weight: bold; padding: 2px 6px; border-radius: 4px; background: var(--border); margin-right: 8px; }
-        .v-num { font-weight: bold; color: var(--accent); margin-right: 10px; }
-        
-        .nvi-text { color: #7f8c8d; } /* Cor um pouco diferente para a NVI */
-        [data-theme="dark"] .nvi-text { color: #95a5a6; }
+        /* --- CONTEÚDO --- */
+        main { max-width: 900px; margin: 0 auto; padding: 20px 15px; }
 
-        .overlay { position: fixed; inset: 0; background: var(--bg); display: none; z-index: 200; padding: 20px; overflow-y: auto; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; margin-top: 20px; }
-        .card { padding: 15px; border: 1px solid var(--border); border-radius: 8px; text-align: center; cursor: pointer; }
+        .verse-block {
+            padding: 8px 0; margin-bottom: 5px; border-radius: 8px; cursor: pointer; transition: background 0.2s;
+            font-size: var(--font-size); line-height: 1.6;
+        }
+        .verse-block:hover { background: var(--panel); }
         
-        #error-msg { color: red; text-align: center; padding: 20px; display: none; }
+        .v-num { font-size: 0.7em; font-weight: bold; color: var(--accent); margin-right: 8px; vertical-align: super; }
+        .version-tag { font-size: 0.6em; text-transform: uppercase; background: var(--border); padding: 2px 4px; border-radius: 4px; margin-right: 5px; color: var(--text); opacity: 0.7; }
+        
+        .nvi-text { color: #7f8c8d; margin-top: 5px; display: block; }
+        [data-theme="dark"] .nvi-text { color: #bdc3c7; }
+
+        /* --- BARRA DE NAVEGAÇÃO INFERIOR --- */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; width: 100%; background: var(--bg);
+            border-top: 1px solid var(--border); padding: 10px; display: flex; justify-content: center; gap: 15px;
+            z-index: 100; box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .nav-btn {
+            background: var(--panel); border: 1px solid var(--border); color: var(--text);
+            padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; flex: 1; max-width: 60px;
+        }
+        .nav-btn:active { background: var(--accent); color: white; }
+
+        /* --- MENU DE CONFIGURAÇÕES (MODAL) --- */
+        .modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5);
+            display: none; justify-content: center; align-items: flex-end; z-index: 2000;
+        }
+        .modal-content {
+            background: var(--bg); width: 100%; max-width: 600px; border-radius: 20px 20px 0 0; padding: 25px;
+            animation: slideUp 0.3s ease; max-height: 80vh; overflow-y: auto;
+        }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+        .setting-group { margin-bottom: 20px; }
+        .setting-label { display: block; font-weight: bold; margin-bottom: 10px; font-size: 0.9rem; color: var(--accent); }
+        
+        .btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
+        .option-btn {
+            padding: 8px 15px; border: 1px solid var(--border); border-radius: 20px; background: var(--panel);
+            color: var(--text); cursor: pointer; font-size: 0.9rem; flex: 1; text-align: center;
+        }
+        .option-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+
+        /* Toast Notification */
+        #toast {
+            position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+            background: #333; color: white; padding: 10px 20px; border-radius: 20px;
+            font-size: 14px; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 3000;
+        }
+
+        /* Loading */
+        .loading { text-align: center; padding: 20px; color: var(--accent); display: none; }
     </style>
 </head>
 <body>
 
 <header>
-    <h2 id="current-title" onclick="openNav()" style="cursor:pointer">Carregando...</h2>
-    <div class="controls">
-        <button id="btn-compare" onclick="toggleCompare()">Comparar NVI</button>
-        <button onclick="toggleTheme()">🌓</button>
-    </div>
+    <div style="font-weight:bold; cursor:pointer;" onclick="toggleMenu()">☰ <span id="header-title">Gênesis 1</span></div>
+    <input type="text" id="search-input" class="search-bar" placeholder="Buscar (ex: João 3:16)">
+    <button class="icon-btn" onclick="doSearch()">🔍</button>
+    <button class="icon-btn" onclick="openSettings()">⚙️</button>
 </header>
 
-<div id="error-msg">Ops! Não conseguimos carregar os arquivos da Bíblia. Verifique se acf.json e nvi.json estão na pasta.</div>
+<main id="content">
+    <div class="loading" id="loader">Carregando Bíblia...</div>
+</main>
 
-<main id="bible-content"></main>
+<div id="toast">Versículo copiado!</div>
 
-<div id="nav-books" class="overlay">
-    <h3>Escolha o Livro</h3>
-    <div id="book-grid" class="grid"></div>
+<div class="bottom-nav">
+    <button class="nav-btn" onclick="nav('prevBook')">&lt;&lt;</button>
+    <button class="nav-btn" onclick="nav('prevChap')">&lt;</button>
+    <button class="nav-btn" onclick="nav('nextChap')">&gt;</button>
+    <button class="nav-btn" onclick="nav('nextBook')">&gt;&gt;</button>
 </div>
 
-<div id="nav-chaps" class="overlay">
-    <button onclick="closeOverlay('nav-chaps')">Voltar</button>
-    <h3>Capítulos</h3>
-    <div id="chap-grid" class="grid"></div>
+<div id="settings-modal" class="modal" onclick="closeSettings(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        
+        <div class="setting-group">
+            <span class="setting-label">VERSÃO DA BÍBLIA</span>
+            <div class="btn-group">
+                <button class="option-btn" onclick="setVersion('acf')" id="btn-acf">ACF</button>
+                <button class="option-btn" onclick="setVersion('nvi')" id="btn-nvi">NVI</button>
+                <button class="option-btn" onclick="setVersion('dual')" id="btn-dual">Comparar</button>
+            </div>
+        </div>
+
+        <div class="setting-group">
+            <span class="setting-label">MODO DE LEITURA</span>
+            <div class="btn-group">
+                <button class="option-btn active" onclick="setViewMode('chapter')" id="btn-mode-chap">Capítulo</button>
+                <button class="option-btn" onclick="setViewMode('book')" id="btn-mode-book">Livro Todo</button>
+            </div>
+        </div>
+
+        <div class="setting-group">
+            <span class="setting-label">TAMANHO DA FONTE</span>
+            <div class="btn-group">
+                <button class="option-btn" onclick="changeSize(-2)">A-</button>
+                <button class="option-btn" onclick="resetSize()">Padrão</button>
+                <button class="option-btn" onclick="changeSize(2)">A+</button>
+            </div>
+        </div>
+
+        <div class="setting-group">
+            <span class="setting-label">TIPO DE FONTE</span>
+            <div class="btn-group">
+                <button class="option-btn" style="font-family: 'Inter'" onclick="setFont('Inter')">Padrão</button>
+                <button class="option-btn" style="font-family: 'Crimson Pro'" onclick="setFont('Crimson Pro')">Clássica</button>
+                <button class="option-btn" style="font-family: 'Merriweather'" onclick="setFont('Merriweather')">Gordinha</button>
+                <button class="option-btn" style="font-family: 'Lato'" onclick="setFont('Lato')">Moderna</button>
+            </div>
+        </div>
+
+        <div class="setting-group">
+            <span class="setting-label">TEMA</span>
+            <div class="btn-group">
+                <button class="option-btn" onclick="setTheme('light')">Dia ☀️</button>
+                <button class="option-btn" onclick="setTheme('dark')">Noite 🌙</button>
+            </div>
+        </div>
+
+        <button class="option-btn" style="width:100%; background:#e74c3c; color:white; border:none; margin-top:10px" onclick="closeSettings(null, true)">Fechar</button>
+    </div>
 </div>
 
 <script>
-    let bibleACF = null;
-    let bibleNVI = null;
-    let currentB = 0;
-    let currentC = 0;
-    let compareMode = false;
+    // --- DADOS E ESTADO ---
+    let bible = { acf: [], nvi: [] };
+    let state = {
+        book: 0,
+        chapter: 0,
+        version: 'acf', // acf, nvi, dual
+        viewMode: 'chapter', // chapter, book
+        fontSize: 18,
+        fontFamily: 'Inter',
+        theme: 'light'
+    };
 
-    // Mapeamento simples de abreviação para Nome (Já que seus JSONs não tem o campo 'name')
-    const bookNames = {"gn": "Gênesis", "ex": "Êxodo", "lv": "Levítico", "nm": "Números", "dt": "Deuteronômio", "js": "Josué", "jz": "Juízes", "rt": "Rute", "1sm": "1 Samuel", "2sm": "2 Samuel", "1rs": "1 Reis", "2rs": "2 Reis", "1cr": "1 Crônicas", "2cr": "2 Crônicas", "ed": "Esdras", "ne": "Neemias", "et": "Ester", "jó": "Jó", "sl": "Salmos", "pv": "Provérbios", "ec": "Eclesiastes", "ct": "Cantares", "is": "Isaías", "jr": "Jeremias", "lm": "Lamentações", "ez": "Ezequiel", "dn": "Daniel", "os": "Oséias", "jl": "Joel", "am": "Amós", "ob": "Obadias", "jn": "Jonas", "mq": "Miquéias", "na": "Naum", "hc": "Habacuque", "sf": "Sofonias", "ag": "Ageu", "zc": "Zacarias", "ml": "Malaquias", "mt": "Mateus", "mc": "Marcos", "lc": "Lucas", "jo": "João", "at": "Atos", "rm": "Romanos", "1co": "1 Coríntios", "2co": "2 Coríntios", "gl": "Gálatas", "ef": "Efésios", "fp": "Filipenses", "cl": "Colossenses", "1ts": "1 Tessalonicenses", "2ts": "2 Tessalonicenses", "1tm": "1 Timóteo", "2tm": "2 Timóteo", "tt": "Tito", "fm": "Filemon", "hb": "Hebreus", "tg": "Tiago", "1pe": "1 Pedro", "2pe": "2 Pedro", "1jo": "1 João", "2jo": "2 João", "3jo": "3 João", "jd": "Judas", "ap": "Apocalipse"};
+    const bookNames = ["Gênesis","Êxodo","Levítico","Números","Deuteronômio","Josué","Juízes","Rute","1 Samuel","2 Samuel","1 Reis","2 Reis","1 Crônicas","2 Crônicas","Esdras","Neemias","Ester","Jó","Salmos","Provérbios","Eclesiastes","Cantares","Isaías","Jeremias","Lamentações","Ezequiel","Daniel","Oséias","Joel","Amós","Obadias","Jonas","Miquéias","Naum","Habacuque","Sofonias","Ageu","Zacarias","Malaquias","Mateus","Marcos","Lucas","João","Atos","Romanos","1 Coríntios","2 Coríntios","Gálatas","Efésios","Filipenses","Colossenses","1 Tessalonicenses","2 Tessalonicenses","1 Timóteo","2 Timóteo","Tito","Filemon","Hebreus","Tiago","1 Pedro","2 Pedro","1 João","2 João","3 João","Judas","Apocalipse"];
+    
+    // Mapeamento de abreviações para índice
+    const abbrevMap = {}; 
 
-    async function start() {
+    // --- INICIALIZAÇÃO ---
+    async function init() {
+        document.getElementById('loader').style.display = 'block';
         try {
-            const [res1, res2] = await Promise.all([
-                fetch('acf.json'),
-                fetch('nvi.json')
-            ]);
+            const [r1, r2] = await Promise.all([fetch('acf.json'), fetch('nvi.json')]);
+            bible.acf = await r1.json();
+            bible.nvi = await r2.json();
             
-            if (!res1.ok || !res2.ok) throw new Error("Erro ao baixar arquivos");
+            // Popula mapa de abreviações
+            bible.acf.forEach((b, i) => {
+                abbrevMap[b.abbrev.toLowerCase()] = i;
+                abbrevMap[bookNames[i].toLowerCase()] = i; // Mapeia nome completo também
+            });
 
-            bibleACF = await res1.json();
-            bibleNVI = await res2.json();
+            loadState();
+            applySettings();
+            render();
+        } catch(e) {
+            alert("Erro ao carregar arquivos JSON. Verifique se estão na pasta.");
+        }
+        document.getElementById('loader').style.display = 'none';
+    }
 
-            // Pega progresso salvo
-            currentB = parseInt(localStorage.getItem('savedB')) || 0;
-            currentC = parseInt(localStorage.getItem('savedC')) || 0;
-            compareMode = localStorage.getItem('compare') === 'true';
+    // --- RENDERIZAÇÃO ---
+    function render() {
+        const content = document.getElementById('content');
+        const b = bible.acf[state.book]; // Referência para pegar tamanho
+        const title = document.getElementById('header-title');
+        
+        // Atualiza Título
+        title.innerText = state.viewMode === 'book' 
+            ? bookNames[state.book] 
+            : `${bookNames[state.book]} ${state.chapter + 1}`;
 
-            if(compareMode) document.getElementById('btn-compare').classList.add('active');
+        let html = '';
+        
+        // Define quantos capítulos renderizar
+        let startChap = state.viewMode === 'book' ? 0 : state.chapter;
+        let endChap = state.viewMode === 'book' ? b.chapters.length : state.chapter + 1;
 
-            renderBooks();
-            displayChapter();
-        } catch (err) {
-            console.error(err);
-            document.getElementById('error-msg').style.display = 'block';
+        for (let c = startChap; c < endChap; c++) {
+            if (state.viewMode === 'book') html += `<h3 style="margin-top:30px; border-bottom:1px solid #ddd">Capítulo ${c+1}</h3>`;
+            
+            const chapACF = bible.acf[state.book].chapters[c];
+            const chapNVI = bible.nvi[state.book].chapters[c];
+
+            chapACF.forEach((vText, vIndex) => {
+                let verseHTML = `<div class="verse-block" onclick="copyVerse(this, '${bookNames[state.book]} ${c+1}:${vIndex+1}')">`;
+                
+                // Versão Principal (ou ACF no Dual)
+                if (state.version === 'acf' || state.version === 'dual') {
+                    verseHTML += `<div><span class="v-num">${vIndex + 1}</span>`;
+                    if(state.version === 'dual') verseHTML += `<span class="version-tag">ACF</span>`;
+                    verseHTML += `${vText}</div>`;
+                }
+
+                // Versão NVI
+                if (state.version === 'nvi' || state.version === 'dual') {
+                    if (state.version === 'nvi') verseHTML += `<div><span class="v-num">${vIndex + 1}</span>${chapNVI[vIndex]}</div>`;
+                    else verseHTML += `<div class="nvi-text"><span class="version-tag">NVI</span>${chapNVI[vIndex] || ''}</div>`;
+                }
+                
+                verseHTML += `</div>`;
+                html += verseHTML;
+            });
+        }
+
+        // Botão Continuar Lento (Próximo Capítulo)
+        if(state.viewMode === 'chapter') {
+            html += `<button onclick="nav('nextChap')" style="width:100%; padding:15px; margin-top:20px; background:var(--panel); border:1px solid var(--border); border-radius:10px; font-size:1rem;">Carregar Próximo Capítulo ⬇</button>`;
+        }
+
+        content.innerHTML = html;
+        window.scrollTo(0, 0);
+        saveState();
+        updateUIControls();
+    }
+
+    // --- NAVEGAÇÃO ---
+    function nav(action) {
+        const totalBooks = bible.acf.length;
+        const totalChaps = bible.acf[state.book].chapters.length;
+
+        if (action === 'nextChap') {
+            if (state.chapter < totalChaps - 1) state.chapter++;
+            else if (state.book < totalBooks - 1) { state.book++; state.chapter = 0; }
+        } else if (action === 'prevChap') {
+            if (state.chapter > 0) state.chapter--;
+            else if (state.book > 0) { state.book--; state.chapter = bible.acf[state.book].chapters.length - 1; }
+        } else if (action === 'nextBook') {
+            if (state.book < totalBooks - 1) { state.book++; state.chapter = 0; }
+        } else if (action === 'prevBook') {
+            if (state.book > 0) { state.book--; state.chapter = 0; }
+        }
+        render();
+    }
+
+    // --- BUSCA ---
+    function doSearch() {
+        const input = document.getElementById('search-input').value.toLowerCase().trim();
+        // Regex para capturar: (Livro) (Capitulo)(Separador)(Versiculo opcional)
+        // Ex: "joao 3", "gn 1:1", "1 pedro 2"
+        const match = input.match(/(\d?\s?[a-zçãõêíóú]+)\s+(\d+)(?:[:\.](\d+))?/);
+
+        if (match) {
+            let bookName = match[1].trim();
+            let chap = parseInt(match[2]) - 1;
+            let verse = match[3] ? parseInt(match[3]) : null;
+
+            // Tenta achar o livro pelo nome ou abreviação
+            let bookIdx = -1;
+            // Busca exata primeiro
+            if (abbrevMap[bookName] !== undefined) bookIdx = abbrevMap[bookName];
+            else {
+                // Busca parcial (ex: "mat" acha "mateus")
+                for (let key in abbrevMap) {
+                    if (key.startsWith(bookName)) { bookIdx = abbrevMap[key]; break; }
+                }
+            }
+
+            if (bookIdx !== -1) {
+                state.book = bookIdx;
+                // Valida capítulo
+                const maxChap = bible.acf[bookIdx].chapters.length;
+                if (chap >= 0 && chap < maxChap) {
+                    state.chapter = chap;
+                    state.viewMode = 'chapter';
+                    render();
+                    if(verse) alert(`Navegamos para o capítulo. Role para o versículo ${verse}.`); // Simples scroll visual
+                } else {
+                    alert(`Este livro só tem ${maxChap} capítulos.`);
+                }
+            } else {
+                alert("Livro não encontrado. Tente 'João 3' ou 'Gn 1'");
+            }
         }
     }
 
-    function displayChapter() {
-        const container = document.getElementById('bible-content');
-        const bookA = bibleACF[currentB];
-        const bookN = bibleNVI[currentB];
-        const chapA = bookA.chapters[currentC];
-        const chapN = bookN.chapters[currentC];
-
-        const fullName = bookNames[bookA.abbrev.toLowerCase()] || bookA.abbrev.toUpperCase();
-        document.getElementById('current-title').innerText = `${fullName} ${currentC + 1}`;
-
-        let html = '';
-        chapA.forEach((verse, i) => {
-            html += `
-                <div class="verse-container">
-                    <div class="verse-text">
-                        <span class="v-num">${i+1}</span>
-                        ${compareMode ? '<span class="v-label">ACF</span>' : ''}
-                        ${verse}
-                    </div>
-                    ${compareMode ? `
-                    <div class="verse-text nvi-text">
-                        <span class="v-label">NVI</span>
-                        ${chapN[i] || '[Versículo não disponível nesta versão]'}
-                    </div>` : ''}
-                </div>
-            `;
-        });
-
-        container.innerHTML = html;
-        localStorage.setItem('savedB', currentB);
-        localStorage.setItem('savedC', currentC);
-        window.scrollTo(0,0);
+    // --- CONFIGURAÇÕES E UTILITÁRIOS ---
+    function openSettings() { document.getElementById('settings-modal').style.display = 'flex'; }
+    function closeSettings(e, force) { 
+        if(force || e.target.id === 'settings-modal') document.getElementById('settings-modal').style.display = 'none'; 
     }
 
-    function toggleCompare() {
-        compareMode = !compareMode;
-        localStorage.setItem('compare', compareMode);
-        document.getElementById('btn-compare').classList.toggle('active');
-        displayChapter();
+    function setVersion(v) { state.version = v; updateUIControls(); render(); }
+    function setViewMode(m) { state.viewMode = m; updateUIControls(); render(); }
+    function setTheme(t) { state.theme = t; document.body.setAttribute('data-theme', t); saveState(); }
+    
+    function setFont(f) { 
+        state.fontFamily = f; 
+        document.documentElement.style.setProperty('--font-main', f + ', sans-serif');
+        saveState();
+    }
+    
+    function changeSize(delta) {
+        state.fontSize += delta;
+        document.documentElement.style.setProperty('--font-size', state.fontSize + 'px');
+        saveState();
+    }
+    function resetSize() { state.fontSize = 18; changeSize(0); }
+
+    function updateUIControls() {
+        // Atualiza botões ativos no modal
+        document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(`btn-${state.version}`).classList.add('active');
+        document.getElementById(`btn-mode-${state.viewMode === 'book' ? 'book' : 'chap'}`).classList.add('active');
     }
 
-    function renderBooks() {
-        const grid = document.getElementById('book-grid');
-        grid.innerHTML = bibleACF.map((b, i) => {
-            const name = bookNames[b.abbrev.toLowerCase()] || b.abbrev.toUpperCase();
-            return `<div class="card" onclick="openChapters(${i})">${name}</div>`;
-        }).join('');
+    function copyVerse(el, ref) {
+        const text = el.innerText.replace(/ACF|NVI/g, '').replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
+        navigator.clipboard.writeText(`${text} (${ref})`);
+        
+        const toast = document.getElementById('toast');
+        toast.style.opacity = 1;
+        setTimeout(() => toast.style.opacity = 0, 2000);
     }
 
-    function openChapters(i) {
-        currentB = i;
-        document.getElementById('nav-books').style.display = 'none';
-        const grid = document.getElementById('chap-grid');
-        grid.innerHTML = bibleACF[i].chapters.map((_, c) => `
-            <div class="card" onclick="selectChap(${c})">${c+1}</div>
-        `).join('');
-        document.getElementById('nav-chaps').style.display = 'block';
+    // --- STATE MANAGEMENT ---
+    function saveState() {
+        localStorage.setItem('bibleState_v3', JSON.stringify(state));
     }
-
-    function selectChap(c) {
-        currentC = c;
-        document.getElementById('nav-chaps').style.display = 'none';
-        displayChapter();
+    function loadState() {
+        const saved = JSON.parse(localStorage.getItem('bibleState_v3'));
+        if (saved) {
+            state = { ...state, ...saved };
+            // Aplica configs visuais
+            document.body.setAttribute('data-theme', state.theme);
+            document.documentElement.style.setProperty('--font-size', state.fontSize + 'px');
+            document.documentElement.style.setProperty('--font-main', state.fontFamily + ', sans-serif');
+        }
     }
+    function applySettings() { updateUIControls(); }
 
-    function openNav() { document.getElementById('nav-books').style.display = 'block'; }
-    function closeOverlay(id) { document.getElementById(id).style.display = 'none'; }
-    function toggleTheme() {
-        const b = document.body;
-        b.setAttribute('data-theme', b.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
-    }
-
-    start();
+    init();
 </script>
 </body>
 </html>
