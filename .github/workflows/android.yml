@@ -44,12 +44,14 @@ jobs:
           
       - name: Configure ARMv7 & SDK
         run: |
-          # Ajusta versões do SDK
+          # Ajusta versões do SDK para compatibilidade
           sed -i 's/minSdkVersion = .*/minSdkVersion = 24/' android/variables.gradle
           sed -i 's/targetSdkVersion = .*/targetSdkVersion = 33/' android/variables.gradle
           
-          # Configura suporte a 32 bits (ARMv7) via Split ABI
-          sed -i '/buildTypes {/i           splits {              abi {                  enable true                  reset()                  include "armeabi-v7a", "arm64-v8a"                  universalApk true              }          }' android/app/build.gradle
+          # Habilita suporte a 32 bits (ARMv7) via Split ABI
+          # REMOVIDO: reset() (causava erro)
+          # MANTIDO: include explícito e universalApk
+          sed -i '/buildTypes {/i           splits {              abi {                  enable true                  include "armeabi-v7a", "arm64-v8a"                  universalApk true              }          }' android/app/build.gradle
 
       - name: Build with Gradle
         run: |
