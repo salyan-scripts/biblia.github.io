@@ -1,0 +1,6 @@
+{
+  "appId": "com.salyan.biblia",
+  "appName": "Biblia Pro",
+  "webDir": "www",
+  "bundledWebRuntime": false
+}
