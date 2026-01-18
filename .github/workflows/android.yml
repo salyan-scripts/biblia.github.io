@@ -1,22 +1,62 @@
-name: Build Nativo ARMv7
+name: Build Nativo com Icone
 on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      
       - name: set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
+
+      - name: Generate Android Icons
+        run: |
+          # Instalamos a ferramenta apenas no servidor (64bit)
+          npm install -g @capacitor/assets
+          # Criamos uma estrutura temporária para a ferramenta funcionar
+          mkdir -p assets
+          cp icon.png assets/icon.png
+          # Gera os ícones direto para a pasta de recursos do Android
+          npx @capacitor/assets generate --android --assetPath assets --androidProject app
+          
+      - name: Setup Gradle
+        run: |
+          # Cria um arquivo build.gradle básico que o GitHub Actions entende
+          cat <<EOT > build.gradle
+          buildscript {
+              repositories { google(); mavenCentral() }
+              dependencies { classpath 'com.android.tools.build:gradle:8.2.0' }
+          }
+          allprojects {
+              repositories { google(); mavenCentral() }
+          }
+EOT
+          cat <<EOT > app/build.gradle
+          plugins { id 'com.android.application' }
+          android {
+              namespace 'com.salyan.biblia'
+              compileSdk 34
+              defaultConfig {
+                  applicationId "com.salyan.biblia"
+                  minSdk 24
+                  targetSdk 34
+                  versionCode 1
+                  versionName "1.0"
+              }
+          }
+EOT
+
       - name: Build APK
         run: |
-          # Comando simples para compilar projeto Java Android
-          chmod +x gradlew || echo "Sem gradlew"
-          ./gradlew assembleDebug || npx android-build-tools build # Fallback
+          # O wrapper do Gradle será gerado e usado para compilar
+          gradle wrapper
+          ./gradlew assembleDebug
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Biblia-Nativa-APK
-          path: "**/*.apk"
+          name: Biblia-Com-Icone-APK
+          path: app/build/outputs/apk/debug/*.apk
