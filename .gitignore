@@ -1,16 +1,15 @@
-# Scripts de automação
+# Scripts e Ferramentas
 *.sh
-
-# Node e Dependências
 node_modules/
 package-lock.json
 
-# Android e Build
+# Android Build
 .gradle/
 build/
 app/build/
 *.apk
-
-# Segredos e Configurações locais
-.env
 capacitor.config.json
+
+# Logs e Temporários
+*.log
+.env

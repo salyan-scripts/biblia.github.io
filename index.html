@@ -9,24 +9,25 @@
     <meta name="theme-color" content="#007bff">
     <meta name="apple-mobile-web-app-capable" content="yes">
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;700&family=Inter:wght@400;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
-    
     <style>
         :root {
             --bg: #ffffff; --text: #1a1a1a; --panel: #f1f3f5; --border: #dee2e6; --accent: #007bff;
-            --font-size: 18px; --font-family: 'Inter', sans-serif;
+            --font-size: 18px; --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
         [data-theme="dark"] {
             --bg: #121212; --text: #e9ecef; --panel: #2b2f33; --border: #3d4246; --accent: #339af0;
         }
 
+        /* Definições de Fontes para funcionamento Offline */
+        .font-jornal { font-family: 'Crimson Pro', 'Georgia', 'Times New Roman', serif; }
+        .font-moderna { font-family: 'Lato', 'Verdana', sans-serif; }
+        .font-padrao { font-family: 'Inter', 'system-ui', sans-serif; }
+
         body { 
             margin: 0; background: var(--bg); color: var(--text); 
             font-family: var(--font-family); font-size: var(--font-size);
             transition: background 0.3s; padding-bottom: 90px;
-            user-select: none; /* Evita seleção acidental ao clicar nos versos */
+            user-select: none;
         }
 
         header {
@@ -107,9 +108,9 @@
         <div class="opt-row">
             <span class="opt-title">Estilo de Fonte</span>
             <div class="btn-group">
-                <button id="f-Inter" style="font-family:'Inter'" onclick="setFnt('Inter')">Padrão</button>
-                <button id="f-Crimson" style="font-family:'Crimson Pro'" onclick="setFnt('Crimson Pro')">Jornal</button>
-                <button id="f-Lato" style="font-family:'Lato'" onclick="setFnt('Lato')">Moderna</button>
+                <button id="f-Inter" class="font-padrao" onclick="setFnt('Inter')">Padrão</button>
+                <button id="f-Crimson" class="font-jornal" onclick="setFnt('Crimson Pro')">Jornal</button>
+                <button id="f-Lato" class="font-moderna" onclick="setFnt('Lato')">Moderna</button>
             </div>
         </div>
         <div class="opt-row">
@@ -134,9 +135,13 @@
 <div id="toast">Copiado para a área de transferência!</div>
 
 <script>
-    // Registro do Service Worker para funcionar como App Offline
+    // Registro Robusto do Service Worker
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js').catch(() => {});
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js')
+                .then(reg => console.log('Offline Ready'))
+                .catch(err => console.log('SW Error', err));
+        });
     }
 
     let data = { acf: [], nvi: [] };
@@ -145,9 +150,12 @@
 
     async function init() {
         try {
-            const [r1, r2] = await Promise.all([fetch('acf.json'), fetch('nvi.json')]);
-            data.acf = await r1.json();
-            data.nvi = await r2.json();
+            const [r1, r2] = await Promise.all([
+                fetch('acf.json').then(r => r.json()),
+                fetch('nvi.json').then(r => r.json())
+            ]);
+            data.acf = r1;
+            data.nvi = r2;
             
             const saved = JSON.parse(localStorage.getItem('biblia_v5_save'));
             if(saved) cfg = {...cfg, ...saved};
@@ -157,11 +165,17 @@
             renderBooks();
             applyCfg();
             draw();
-        } catch(e) { document.getElementById('bible-box').innerHTML = "Erro ao carregar dados."; }
+        } catch(e) { 
+            document.getElementById('bible-box').innerHTML = "Bíblia disponível offline. Carregando...";
+            // Tenta carregar novamente após 1s caso o SW ainda esteja populando o cache
+            setTimeout(init, 1000);
+        }
     }
 
     function draw() {
         const box = document.getElementById('bible-box');
+        if(!data.acf[cfg.b]) return;
+        
         const b = data.acf[cfg.b];
         document.getElementById('cur-ref').innerText = `${bNames[cfg.b]} ${cfg.c + 1}`;
         
@@ -238,7 +252,12 @@
     function applyCfg() {
         document.body.setAttribute('data-theme', cfg.t);
         document.documentElement.style.setProperty('--font-size', cfg.s + 'px');
-        document.documentElement.style.setProperty('--font-family', cfg.f === 'Inter' ? "'Inter', sans-serif" : (cfg.f === 'Crimson Pro' ? "'Crimson Pro', serif" : `'${cfg.f}', sans-serif`));
+        
+        let fontValue = "'Inter', sans-serif";
+        if(cfg.f === 'Crimson Pro') fontValue = "'Crimson Pro', 'Georgia', serif";
+        if(cfg.f === 'Lato') fontValue = "'Lato', 'Verdana', sans-serif";
+        
+        document.documentElement.style.setProperty('--font-family', fontValue);
         
         document.querySelectorAll('.btn-group button').forEach(b => b.classList.remove('active'));
         const vBtn = document.getElementById('v-'+cfg.v); if(vBtn) vBtn.classList.add('active');
