@@ -6,3 +6,4 @@ fix_gradle_v2.sh
 build_nativo.sh
 add_icon.sh
 build_final_nativo.shfix_syntax.sh
+gerar_apk_final.sh

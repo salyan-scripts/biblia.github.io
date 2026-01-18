@@ -1,4 +1,4 @@
-name: Build Nativo
+name: Build Final Nativo
 on: [push]
 jobs:
   build:
@@ -12,12 +12,25 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Generate Icons
+      - name: Fix Android Resources
         run: |
-          npm install -g @capacitor/assets
-          mkdir -p assets
-          [ -f "icon.png" ] && cp icon.png assets/icon.png
-          npx @capacitor/assets generate --android --assetPath assets --androidProject app || echo "Icons failed"
+          # Criar pastas de ícone manualmente para garantir que o Android não reclame
+          mkdir -p app/src/main/res/mipmap-mdpi
+          mkdir -p app/src/main/res/mipmap-hdpi
+          mkdir -p app/src/main/res/mipmap-xhdpi
+          
+          # Se o icon.png existir, tenta gerar. Se não, usa um placeholder.
+          if [ -f "icon.png" ]; then
+            npm install -g @capacitor/assets
+            mkdir -p assets
+            cp icon.png assets/icon.png
+            npx @capacitor/assets generate --android --assetPath assets --androidProject app || echo "Falha no gerador"
+          fi
+          
+          # Garantia: Se o ícone não foi gerado, cria um arquivo vazio para não dar erro de compilação
+          if [ ! -f "app/src/main/res/mipmap-mdpi/ic_launcher.png" ]; then
+             cp icon.png app/src/main/res/mipmap-mdpi/ic_launcher.png || touch app/src/main/res/mipmap-mdpi/ic_launcher.png
+          fi
 
       - name: Build APK
         run: |
@@ -28,5 +41,5 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Biblia-Final-APK
+          name: Biblia-Instalador-APK
           path: app/build/outputs/apk/debug/*.apk
